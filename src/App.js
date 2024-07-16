@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Button, Container, Typography, Modal, Box, TextField } from '@mui/material';
+import React from 'react';
+import { Container, Button, Typography, Modal, Box, TextField } from '@mui/material';
+import { useState } from 'react';
+import axios from 'axios';
 
 const style = {
   position: 'absolute',
@@ -19,69 +21,97 @@ function App() {
     referrerName: '',
     referrerEmail: '',
     refereeName: '',
-    refereeEmail: ''
+    refereeEmail: '',
+    course: '',
   });
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log(formData);
+    try {
+      const response = await axios.post('https://accredian-backend-task-p80a.onrender.com/api/referrals', formData);
+      console.log('Referral submitted:', response.data);
+      handleClose();
+    } catch (error) {
+      console.error('Error submitting referral:', error);
+    }
   };
 
   return (
     <Container>
-      <Typography variant="h2" align="center" gutterBottom>
+      <Typography variant="h2" gutterBottom>
         Refer & Earn
       </Typography>
-      <Button variant="contained" color="primary" onClick={handleOpen}>
+      <Button variant="contained" onClick={handleOpen}>
         Refer Now
       </Button>
-      <Modal open={open} onClose={handleClose}>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
         <Box sx={style}>
-          <Typography variant="h6" component="h2">
+          <Typography id="modal-title" variant="h6" component="h2">
             Referral Form
           </Typography>
           <form onSubmit={handleSubmit}>
             <TextField
-              margin="normal"
-              required
               fullWidth
-              label="Your Name"
+              margin="normal"
+              label="Referrer Name"
               name="referrerName"
+              value={formData.referrerName}
               onChange={handleChange}
+              required
             />
             <TextField
-              margin="normal"
-              required
               fullWidth
-              label="Your Email"
+              margin="normal"
+              label="Referrer Email"
               name="referrerEmail"
               type="email"
+              value={formData.referrerEmail}
               onChange={handleChange}
+              required
             />
             <TextField
-              margin="normal"
-              required
               fullWidth
-              label="Friend's Name"
+              margin="normal"
+              label="Referee Name"
               name="refereeName"
+              value={formData.refereeName}
               onChange={handleChange}
+              required
             />
             <TextField
-              margin="normal"
-              required
               fullWidth
-              label="Friend's Email"
+              margin="normal"
+              label="Referee Email"
               name="refereeEmail"
               type="email"
+              value={formData.refereeEmail}
               onChange={handleChange}
+              required
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Course"
+              name="course"
+              value={formData.course}
+              onChange={handleChange}
+              required
             />
             <Button type="submit" variant="contained" color="primary">
               Submit
